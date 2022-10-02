@@ -84,6 +84,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private readonly _rightAxisCell: HTMLElement;
 	private readonly _canvasBinding: CanvasCoordinateSpaceBinding;
 	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
+	private readonly _topGridCanvasBinding: CanvasCoordinateSpaceBinding;
 	private readonly _rowElement: HTMLElement;
 	private readonly _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
@@ -136,6 +137,14 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		topCanvas.style.zIndex = '2';
 		topCanvas.style.left = '0';
 		topCanvas.style.top = '0';
+
+		this._topGridCanvasBinding = createBoundCanvas(paneWrapper, new Size(16, 16));
+		this._topGridCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
+		const topGridCanvas = this._topGridCanvasBinding.canvas;
+		topGridCanvas.style.position = 'absolute';
+		topGridCanvas.style.zIndex = '3';
+		topGridCanvas.style.left = '0';
+		topGridCanvas.style.top = '0';
 
 		this._rowElement = document.createElement('tr');
 		this._rowElement.appendChild(this._leftAxisCell);
@@ -426,6 +435,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._isSettingSize = true;
 		this._canvasBinding.resizeCanvas({ width: size.w, height: size.h });
 		this._topCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
+		this._topGridCanvasBinding.resizeCanvas({ width: size.w, height: size.h });
 		this._isSettingSize = false;
 		this._paneCell.style.width = size.w + 'px';
 		this._paneCell.style.height = size.h + 'px';
@@ -491,6 +501,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
 		this._drawSources(topCtx, this._canvasBinding.pixelRatio, sourceTopPaneViews);
 		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
+		const topGridCtx = getContext2D(this._topGridCanvasBinding.canvas);
+		topGridCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
+		topCtx.arc(100,200,30,0,Math.PI*2,true)
+		topCtx.stroke()
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
