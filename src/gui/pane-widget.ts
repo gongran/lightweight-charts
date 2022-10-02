@@ -503,8 +503,8 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
 		const topGridCtx = getContext2D(this._topGridCanvasBinding.canvas);
 		topGridCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
-		topCtx.arc(100,200,30,0,Math.PI*2,true)
-		topCtx.stroke()
+		topCtx.arc(100, 200, 30, 0, Math.PI * 2, true);
+		topCtx.stroke();
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
