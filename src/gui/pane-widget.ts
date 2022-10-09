@@ -490,6 +490,9 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			this._drawBackground(ctx, this._canvasBinding.pixelRatio);
 			if (this._state) {
 				this._drawGrid(ctx, this._canvasBinding.pixelRatio);
+				const topGridCtx = getContext2D(this._topGridCanvasBinding.canvas);
+				topGridCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
+				this._drawGridTrading(topGridCtx, this._canvasBinding.pixelRatio);
 				this._drawWatermark(ctx, this._canvasBinding.pixelRatio);
 				this._drawSources(ctx, this._canvasBinding.pixelRatio, sourcePaneViews);
 				this._drawSources(ctx, this._canvasBinding.pixelRatio, sourceLabelPaneViews);
@@ -501,10 +504,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		topCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
 		this._drawSources(topCtx, this._canvasBinding.pixelRatio, sourceTopPaneViews);
 		this._drawCrosshair(topCtx, this._topCanvasBinding.pixelRatio);
-		const topGridCtx = getContext2D(this._topGridCanvasBinding.canvas);
-		topGridCtx.clearRect(0, 0, Math.ceil(this._size.w * this._topCanvasBinding.pixelRatio), Math.ceil(this._size.h * this._topCanvasBinding.pixelRatio));
-		topGridCtx.arc(100, 200, 30, 0, Math.PI * 2, true);
-		topGridCtx.stroke();
 	}
 
 	public leftPriceAxisWidget(): PriceAxisWidget | null {
@@ -540,6 +539,18 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _drawGrid(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
 		const state = ensureNotNull(this._state);
 		const paneView = state.grid().paneView();
+		const renderer = paneView.renderer(state.height(), state.width());
+
+		if (renderer !== null) {
+			ctx.save();
+			renderer.draw(ctx, pixelRatio, false);
+			ctx.restore();
+		}
+	}
+
+	private _drawGridTrading(ctx: CanvasRenderingContext2D, pixelRatio: number): void {
+		const state = ensureNotNull(this._state);
+		const paneView = state.gridTrading().panView();
 		const renderer = paneView.renderer(state.height(), state.width());
 
 		if (renderer !== null) {

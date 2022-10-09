@@ -25,7 +25,7 @@ export class SeriesPriceLinePaneView extends SeriesHorizontalLinePaneView {
 
 		data.visible = true;
 		data.y = lastValueData.coordinate;
-		data.color = this._series.priceLineColor(lastValueData.color);
+		data.color = 'red';
 		data.width = width;
 		data.height = height;
 		data.lineWidth = seriesOptions.priceLineWidth;
