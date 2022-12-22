@@ -134,7 +134,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._topCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
 		const topCanvas = this._topCanvasBinding.canvas;
 		topCanvas.style.position = 'absolute';
-		topCanvas.style.zIndex = '2';
+		topCanvas.style.zIndex = '3';
 		topCanvas.style.left = '0';
 		topCanvas.style.top = '0';
 
@@ -142,7 +142,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._topGridCanvasBinding.subscribeCanvasConfigured(this._topCanvasConfiguredHandler);
 		const topGridCanvas = this._topGridCanvasBinding.canvas;
 		topGridCanvas.style.position = 'absolute';
-		topGridCanvas.style.zIndex = '3';
+		topGridCanvas.style.zIndex = '2';
 		topGridCanvas.style.left = '0';
 		topGridCanvas.style.top = '0';
 
