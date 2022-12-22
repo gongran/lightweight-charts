@@ -410,7 +410,7 @@ module.exports = {
 							'ordered-imports': [
 								true,
 								{
-									'grouped-imports': true,
+									'grouped-imports': false,
 									groups: [
 										{
 											name: 'nodejs-core',

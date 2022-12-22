@@ -63,7 +63,8 @@ export class GridTradingRenderer implements IPaneRenderer {
 				setLineStyle(ctx, data.horzLineStyle);
 				ctx.beginPath();
 
-				//根据价格获取坐标
+				// 根据价格获取坐标
+
 				const priceTopCoordinate = this._pane
 					?.rightPriceScale()
 					.priceToCoordinate(
@@ -82,30 +83,26 @@ export class GridTradingRenderer implements IPaneRenderer {
 				ctx.moveTo(0, Number(priceLowCoordinate));
 				ctx.lineTo(width, Number(priceLowCoordinate));
 
-				//create grid
-				let gridQuantity = Number(this._data?.tradingGridData.gridQuantity);
-				let tradingGridType = Number(
+				// create grid
+
+				const gridQuantity = Number(this._data?.tradingGridData.gridQuantity);
+				const tradingGridType = Number(
 					this._data?.tradingGridData.tradingGridType
 				);
-				if (tradingGridType == TradingGridType.Geometric) {
-					//等比
-					let gridPrice =
+				if (tradingGridType === TradingGridType.Geometric) {
+					// 等比
+					const gridPrice =
 						(Number(this._data?.tradingGridData.highPrice) -
 							Number(this._data?.tradingGridData.lowPrice)) /
 						gridQuantity;
-					console.log('gridPrice', gridPrice);
+
 					for (let i = 1; i < gridQuantity; i++) {
-						let gridPriceCoordinate = this._pane
+						const gridPriceCoordinate = this._pane
 							?.rightPriceScale()
 							.priceToCoordinate(
 								Number(this._data?.tradingGridData.lowPrice) + gridPrice * i,
 								Number(data.priceMarks[0].label)
 							);
-						console.log(
-							'gridPriceCoordinate,price',
-							gridPriceCoordinate,
-							Number(this._data?.tradingGridData.lowPrice) + gridPrice * i
-						);
 						ctx.moveTo(0, Number(gridPriceCoordinate));
 						ctx.lineTo(width, Number(gridPriceCoordinate));
 					}
