@@ -11,4 +11,8 @@ export class GridTrading {
 	public panView(): IUpdatablePaneView {
 		return this._paneView;
 	}
+
+	public gridridTradingPaneView(): GridTradingPaneView {
+		return this._paneView;
+	}
 }

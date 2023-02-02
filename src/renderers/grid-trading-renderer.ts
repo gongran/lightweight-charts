@@ -1,4 +1,5 @@
 import { ensureNotNull } from '../helpers/assertions';
+import { Coordinate } from '../model/coordinate';
 import { Pane } from '../model/pane';
 
 import { PriceMark } from '../model/price-scale';
@@ -11,22 +12,24 @@ const enum TradingGridType {
 	Arithmetic // 等差
 }
 export interface GridTradingRendererData {
-	horzLinesVisible: boolean;
-	horzLinesColor: string;
-	horzLineStyle: LineStyle;
-	priceMarks: PriceMark[];
+	horzLinesVisible?: boolean | undefined;
+	horzLinesColor?: string | undefined;
+	horzLineStyle?: LineStyle | undefined;
+	priceMarks?: PriceMark[] | undefined;
 
-	h: number;
-	w: number;
+	h?: number | undefined;
+	w?: number | undefined;
 
-	tradingGridData: TradingGridData;
+	tradingGridData?: TradingGridData | undefined;
 }
 
 export interface TradingGridData {
-	lowPrice: number;
-	highPrice: number;
-	gridQuantity: number;
-	tradingGridType: TradingGridType;
+	lowPrice?: number;
+	highPrice?: number;
+	gridQuantity?: number;
+	tradingGridType?: TradingGridType;
+	preY?: number;
+	nowY?: number;
 }
 
 export class GridTradingRenderer implements IPaneRenderer {
@@ -40,74 +43,102 @@ export class GridTradingRenderer implements IPaneRenderer {
 	public setData(data: GridTradingRendererData | null): void {
 		this._data = data;
 	}
+	public getData(): GridTradingRendererData | null {
+		return this._data;
+	}
 	public draw(
 		ctx: CanvasRenderingContext2D,
 		pixelRatio: number,
 		isHovered: boolean,
 		hitTestData?: unknown
 	): void {
-		// eslint-disable-next-line no-console
-		console.log('data');
-		// eslint-disable-next-line no-console
-		console.log(this._data);
 		if (this._data === null) {
 			return;
 		}
 		const lineWidth = Math.max(1, Math.floor(pixelRatio));
 		ctx.lineWidth = lineWidth;
-		const width = Math.ceil(this._data.w * pixelRatio);
+		const width = Math.ceil(this._data.w || 0 * pixelRatio);
 		strokeInPixel(ctx, () => {
+			ctx.clearRect(0, 0, this._data?.w || 0, this._data?.h || 0);
 			const data = ensureNotNull(this._data);
+			let movingDistance =
+				(this._data?.tradingGridData?.nowY || 0) -
+				(this._data?.tradingGridData?.preY || 0);
 			if (data.horzLinesVisible) {
-				ctx.strokeStyle = data.horzLinesColor;
-				setLineStyle(ctx, data.horzLineStyle);
+				ctx.strokeStyle = data.horzLinesColor || '';
+				setLineStyle(ctx, data.horzLineStyle || 0);
 				ctx.beginPath();
 
 				// 根据价格获取坐标
-
+				let priceMarksLabel = 0;
+				if (data.priceMarks) {
+					let lastValue = data.priceMarks[data.priceMarks.length - 1];
+					priceMarksLabel = Number(lastValue.label);
+				}
+				const highPrice = Number(this._data?.tradingGridData?.highPrice || 0);
+				const lowPrice = Number(this._data?.tradingGridData?.lowPrice || 0);
 				const priceTopCoordinate = this._pane
 					?.rightPriceScale()
-					.priceToCoordinate(
-						Number(this._data?.tradingGridData.highPrice),
-						Number(data.priceMarks[0].label)
-					);
+					.priceToCoordinate(highPrice, priceMarksLabel);
+
 				const priceLowCoordinate = this._pane
 					?.rightPriceScale()
-					.priceToCoordinate(
-						Number(this._data?.tradingGridData.lowPrice),
-						Number(data.priceMarks[0].label)
+					.priceToCoordinate(lowPrice, priceMarksLabel);
+
+				const topPriceCoordinate = Number(priceTopCoordinate) + movingDistance;
+				const lowPriceCoordinate = Number(priceLowCoordinate) + movingDistance;
+				if (priceTopCoordinate) {
+					console.log(
+						'Coordinate to top price',
+						priceTopCoordinate,
+						this._pane
+							?.rightPriceScale()
+							.coordinateToPrice(
+								topPriceCoordinate as Coordinate,
+								priceMarksLabel
+							)
 					);
+				}
+				if (priceLowCoordinate) {
+					console.log(
+						'Coordinate to low price',
+						priceLowCoordinate,
+						this._pane
+							?.rightPriceScale()
+							.coordinateToPrice(
+								lowPriceCoordinate as Coordinate,
+								priceMarksLabel
+							)
+					);
+				}
 				// ctx.rect(0, Number(priceCoordinate), width, 2000);
-				ctx.moveTo(0, Number(priceTopCoordinate));
-				ctx.lineTo(width, Number(priceTopCoordinate));
-				ctx.moveTo(0, Number(priceLowCoordinate));
-				ctx.lineTo(width, Number(priceLowCoordinate));
+				ctx.moveTo(0, topPriceCoordinate);
+				ctx.lineTo(width, topPriceCoordinate);
+				ctx.moveTo(0, lowPriceCoordinate);
+				ctx.lineTo(width, lowPriceCoordinate);
 
 				// create grid
 
-				const gridQuantity = Number(this._data?.tradingGridData.gridQuantity);
-				const tradingGridType = Number(
-					this._data?.tradingGridData.tradingGridType
+				const gridQuantity = Number(
+					this._data?.tradingGridData?.gridQuantity || 0
 				);
+				const tradingGridType =
+					this._data?.tradingGridData?.tradingGridType ||
+					TradingGridType.Geometric;
+
 				if (tradingGridType === TradingGridType.Geometric) {
 					// 等比
-					const gridPrice =
-						(Number(this._data?.tradingGridData.highPrice) -
-							Number(this._data?.tradingGridData.lowPrice)) /
-						gridQuantity;
+					const gridPrice = (highPrice - lowPrice) / gridQuantity;
 
 					for (let i = 1; i < gridQuantity; i++) {
 						const gridPriceCoordinate = this._pane
 							?.rightPriceScale()
-							.priceToCoordinate(
-								Number(this._data?.tradingGridData.lowPrice) + gridPrice * i,
-								Number(data.priceMarks[0].label)
-							);
-						ctx.moveTo(0, Number(gridPriceCoordinate));
-						ctx.lineTo(width, Number(gridPriceCoordinate));
+							.priceToCoordinate(lowPrice + gridPrice * i, priceMarksLabel);
+						ctx.moveTo(0, Number(gridPriceCoordinate) + movingDistance);
+						ctx.lineTo(width, Number(gridPriceCoordinate) + movingDistance);
 					}
 				}
-				ctx.strokeStyle = 'red';
+				ctx.strokeStyle = 'orange';
 				ctx.stroke();
 			}
 		});
