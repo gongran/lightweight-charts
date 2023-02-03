@@ -25,11 +25,14 @@ export interface GridTradingRendererData {
 
 export interface TradingGridData {
 	lowPrice?: number;
+	lowCoordinate?: number;
 	highPrice?: number;
+	highCoordinate?: number;
 	gridQuantity?: number;
 	tradingGridType?: TradingGridType;
 	preY?: number;
 	nowY?: number;
+	color?: string | 'orange';
 }
 
 export class GridTradingRenderer implements IPaneRenderer {
@@ -87,8 +90,11 @@ export class GridTradingRenderer implements IPaneRenderer {
 
 				const topPriceCoordinate = Number(priceTopCoordinate) + movingDistance;
 				const lowPriceCoordinate = Number(priceLowCoordinate) + movingDistance;
+				if (this._data?.tradingGridData) {
+					this._data.tradingGridData.lowCoordinate = lowPriceCoordinate;
+					this._data.tradingGridData.highCoordinate = topPriceCoordinate;
+				}
 
-				
 				// ctx.rect(0, Number(priceCoordinate), width, 2000);
 				ctx.moveTo(0, topPriceCoordinate);
 				ctx.lineTo(width, topPriceCoordinate);
@@ -116,7 +122,7 @@ export class GridTradingRenderer implements IPaneRenderer {
 						ctx.lineTo(width, Number(gridPriceCoordinate) + movingDistance);
 					}
 				}
-				ctx.strokeStyle = 'orange';
+				ctx.strokeStyle = this._data?.tradingGridData?.color || 'orange';
 				ctx.stroke();
 
 				const afterMvTopPrice = this._pane

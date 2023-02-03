@@ -1,9 +1,12 @@
 import { Pane } from '../../model/pane';
-import { GridTradingRenderer, GridTradingRendererData } from '../../renderers/grid-trading-renderer';
+import {
+	GridTradingRenderer,
+	GridTradingRendererData
+} from '../../renderers/grid-trading-renderer';
 import { IPaneRenderer } from '../../renderers/ipane-renderer';
 
 import { IUpdatablePaneView, UpdateType } from './iupdatable-pane-view';
-import * as _ from  'lodash';
+import * as _ from 'lodash';
 
 export class GridTradingPaneView implements IUpdatablePaneView {
 	private readonly _pane: Pane;
@@ -17,30 +20,39 @@ export class GridTradingPaneView implements IUpdatablePaneView {
 	public update(updateType?: UpdateType | undefined): void {
 		throw new Error('Method not implemented.');
 	}
-	public setData(data: GridTradingRendererData | null){
-		this._data=data;
+	public setData(data: GridTradingRendererData | null) {
+		this._data = data;
 	}
-	public renderer(height: number, width: number, addAnchors?: boolean | undefined): IPaneRenderer | null {
+
+	public getData(): GridTradingRendererData | null {
+		return this._data;
+	}
+	public renderer(
+		height: number,
+		width: number,
+		addAnchors?: boolean | undefined
+	): IPaneRenderer | null {
 		if (this._invalidated) {
 			const gridOptions = this._pane.model().options().grid;
 			const defaultData: GridTradingRendererData = {
 				horzLinesVisible: gridOptions.horzLines.visible || false,
-				horzLinesColor: gridOptions.horzLines.color|| '#000000',
-				horzLineStyle: gridOptions.horzLines.style|| 0,
-				priceMarks: this._pane.defaultPriceScale().marks()|| [],
-				h: height|| 0,
-				w: width,
+				horzLinesColor: gridOptions.horzLines.color || '#000000',
+				horzLineStyle: gridOptions.horzLines.style || 0,
+				priceMarks: this._pane.defaultPriceScale().marks() || [],
+				h: height || 0,
+				w: width
+			};
+			const data: GridTradingRendererData =
+				this._pane.model().options().gridTradingRendererData || {};
+			let sourceData = this._renderer.getData();
+			if (!sourceData) {
+				sourceData = data;
 			}
-			const data: GridTradingRendererData = this._pane.model().options().gridTradingRendererData||{};
-			let sourceData=this._renderer.getData();
-			if(!sourceData){
-				sourceData=data;
-			}
-			let otherData=this._data;
-			_.merge(sourceData,defaultData);
-			_.merge(sourceData,otherData);
+			let otherData = this._data;
+			_.merge(sourceData, defaultData);
+			_.merge(sourceData, otherData);
 			this._renderer.setData(sourceData);
-			this._invalidated = false;
+			// this._invalidated = false;
 		}
 		return this._renderer;
 	}

@@ -12,7 +12,7 @@ export class GridTrading {
 		return this._paneView;
 	}
 
-	public gridridTradingPaneView(): GridTradingPaneView {
+	public gridTradingPaneView(): GridTradingPaneView {
 		return this._paneView;
 	}
 }
