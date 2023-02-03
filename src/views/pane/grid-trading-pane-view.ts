@@ -23,20 +23,21 @@ export class GridTradingPaneView implements IUpdatablePaneView {
 	public renderer(height: number, width: number, addAnchors?: boolean | undefined): IPaneRenderer | null {
 		if (this._invalidated) {
 			const gridOptions = this._pane.model().options().grid;
-			const data: GridTradingRendererData = {
+			const defaultData: GridTradingRendererData = {
 				horzLinesVisible: gridOptions.horzLines.visible || false,
 				horzLinesColor: gridOptions.horzLines.color|| '#000000',
 				horzLineStyle: gridOptions.horzLines.style|| 0,
 				priceMarks: this._pane.defaultPriceScale().marks()|| [],
 				h: height|| 0,
 				w: width,
-				tradingGridData: { lowPrice: 18800, highPrice: 20000, gridQuantity: 5, tradingGridType: 0 },
-			};
+			}
+			const data: GridTradingRendererData = this._pane.model().options().gridTradingRendererData||{};
 			let sourceData=this._renderer.getData();
 			if(!sourceData){
 				sourceData=data;
 			}
 			let otherData=this._data;
+			_.merge(sourceData,defaultData);
 			_.merge(sourceData,otherData);
 			this._renderer.setData(sourceData);
 			this._invalidated = false;

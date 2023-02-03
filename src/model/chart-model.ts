@@ -6,6 +6,7 @@ import { Delegate } from '../helpers/delegate';
 import { IDestroyable } from '../helpers/idestroyable';
 import { ISubscription } from '../helpers/isubscription';
 import { DeepPartial, merge } from '../helpers/strict-type-checks';
+import { GridTradingRendererData } from '../renderers/grid-trading-renderer';
 
 import { PriceAxisViewRendererOptions } from '../renderers/iprice-axis-view-renderer';
 import { PriceAxisRendererOptionsProvider } from '../renderers/price-axis-renderer-options-provider';
@@ -294,6 +295,8 @@ export interface ChartOptions {
 	/** @inheritDoc TrackingModeOptions
 	 */
 	trackingMode: TrackingModeOptions;
+
+	gridTradingRendererData?: GridTradingRendererData;
 
 }
 

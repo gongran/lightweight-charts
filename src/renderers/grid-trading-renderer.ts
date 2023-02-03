@@ -87,30 +87,8 @@ export class GridTradingRenderer implements IPaneRenderer {
 
 				const topPriceCoordinate = Number(priceTopCoordinate) + movingDistance;
 				const lowPriceCoordinate = Number(priceLowCoordinate) + movingDistance;
-				if (priceTopCoordinate) {
-					console.log(
-						'Coordinate to top price',
-						priceTopCoordinate,
-						this._pane
-							?.rightPriceScale()
-							.coordinateToPrice(
-								topPriceCoordinate as Coordinate,
-								priceMarksLabel
-							)
-					);
-				}
-				if (priceLowCoordinate) {
-					console.log(
-						'Coordinate to low price',
-						priceLowCoordinate,
-						this._pane
-							?.rightPriceScale()
-							.coordinateToPrice(
-								lowPriceCoordinate as Coordinate,
-								priceMarksLabel
-							)
-					);
-				}
+
+				
 				// ctx.rect(0, Number(priceCoordinate), width, 2000);
 				ctx.moveTo(0, topPriceCoordinate);
 				ctx.lineTo(width, topPriceCoordinate);
@@ -140,6 +118,34 @@ export class GridTradingRenderer implements IPaneRenderer {
 				}
 				ctx.strokeStyle = 'orange';
 				ctx.stroke();
+
+				const afterMvTopPrice = this._pane
+					?.rightPriceScale()
+					.coordinateToPrice(topPriceCoordinate as Coordinate, priceMarksLabel);
+				const afterMvLowPrice = this._pane
+					?.rightPriceScale()
+					.coordinateToPrice(lowPriceCoordinate as Coordinate, priceMarksLabel);
+				// if (this._data?.tradingGridData?.highPrice) {
+				// 	this._data.tradingGridData.highPrice = afterMvTopPrice;
+				// }
+				// if (this._data?.tradingGridData?.lowPrice) {
+				// 	this._data.tradingGridData.lowPrice = afterMvLowPrice;
+				// }
+
+				if (priceTopCoordinate) {
+					console.log(
+						'Coordinate to top price',
+						priceTopCoordinate,
+						afterMvTopPrice
+					);
+				}
+				if (priceLowCoordinate) {
+					console.log(
+						'Coordinate to low price',
+						priceLowCoordinate,
+						afterMvLowPrice
+					);
+				}
 			}
 		});
 	}
