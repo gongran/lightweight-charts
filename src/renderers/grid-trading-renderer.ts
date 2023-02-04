@@ -33,6 +33,7 @@ export interface TradingGridData {
 	preY?: number;
 	nowY?: number;
 	color?: string | 'orange';
+	eventType?: string;
 }
 
 export class GridTradingRenderer implements IPaneRenderer {
@@ -131,26 +132,29 @@ export class GridTradingRenderer implements IPaneRenderer {
 				const afterMvLowPrice = this._pane
 					?.rightPriceScale()
 					.coordinateToPrice(lowPriceCoordinate as Coordinate, priceMarksLabel);
-				// if (this._data?.tradingGridData?.highPrice) {
-				// 	this._data.tradingGridData.highPrice = afterMvTopPrice;
-				// }
-				// if (this._data?.tradingGridData?.lowPrice) {
-				// 	this._data.tradingGridData.lowPrice = afterMvLowPrice;
-				// }
 
-				if (priceTopCoordinate) {
-					console.log(
-						'Coordinate to top price',
-						priceTopCoordinate,
-						afterMvTopPrice
-					);
+				if (this._data?.tradingGridData?.eventType === 'mouseUpEvent') {
+					this._data.tradingGridData.highPrice = afterMvTopPrice;
+					this._data.tradingGridData.lowPrice = afterMvLowPrice;
+					this._data.tradingGridData.nowY=0;
+					this._data.tradingGridData.preY=0;
+					
 				}
-				if (priceLowCoordinate) {
-					console.log(
-						'Coordinate to low price',
-						priceLowCoordinate,
-						afterMvLowPrice
-					);
+				if (this._data?.tradingGridData?.eventType !== 'mouseMoveEvent') {
+					if (priceTopCoordinate) {
+						console.log(
+							'Coordinate to top price',
+							priceTopCoordinate,
+							afterMvTopPrice
+						);
+					}
+					if (priceLowCoordinate) {
+						console.log(
+							'Coordinate to low price',
+							priceLowCoordinate,
+							afterMvLowPrice
+						);
+					}
 				}
 			}
 		});

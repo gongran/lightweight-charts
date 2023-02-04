@@ -356,7 +356,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		if (!this._state) {
 			return;
 		}
-		console.log('mouseMoveEvent');
 		this._onMouseEvent();
 
 		const x = event.localX;
@@ -370,7 +369,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				?.lowCoordinate || 0;
 		if (y > highCoordinate && y < lowCoordinate) {
 			this._gridTrading.gridTradingPaneView().setData({
-				tradingGridData: { color: 'red' }
+				tradingGridData: { color: 'red', eventType: 'mouseMoveEvent' }
 			});
 			const rend = this._gridTrading
 				.panView()
@@ -384,9 +383,12 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				);
 			}
 		} else {
-			if(state.model().options().gridTradingRendererData?.tradingGridData?.color==='red'){
+			if (
+				state.model().options().gridTradingRendererData?.tradingGridData
+					?.color === 'red'
+			) {
 				this._gridTrading.gridTradingPaneView().setData({
-					tradingGridData: { color: 'orange' }
+					tradingGridData: { color: 'orange', eventType: 'mouseMoveEvent' }
 				});
 				const rend = this._gridTrading
 					.panView()
@@ -431,7 +433,11 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				const gridTrading = new GridTrading(this._state);
 				const ctx = getContext2D(this._topGridCanvasBinding.canvas);
 				gridTrading.gridTradingPaneView().setData({
-					tradingGridData: { preY: this.preY, nowY: event.localY }
+					tradingGridData: {
+						preY: this.preY,
+						nowY: event.localY,
+						eventType: 'pressedMouseMoveEvent'
+					}
 				});
 				const rend = gridTrading
 					.panView()
@@ -456,6 +462,23 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._longTap = false;
 
 		this._endScroll(event);
+
+		this._gridTrading.gridTradingPaneView().setData({
+			tradingGridData: {eventType: 'mouseUpEvent' }
+		});
+		const rend = this._gridTrading
+			.panView()
+			.renderer(this._state.height(), this._state.width());
+		if (rend !== null) {
+			rend.draw(
+				this._topGridCtx,
+				1,
+				false,
+				this._model().timeScale().rightOffset()
+			);
+		}
+
+		console.log('mouseUpEvent');
 	}
 
 	public longTapEvent(event: MouseEventHandlerTouchEvent): void {
