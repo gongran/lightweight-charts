@@ -52,6 +52,7 @@ export class ChartWidget implements IDestroyable {
 	private _drawPlanned: boolean = false;
 	private _clicked: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _crosshairMoved: Delegate<MouseEventParamsImplSupplier> = new Delegate();
+	private _dragEnd: Delegate<MouseEventParamsImplSupplier> = new Delegate();
 	private _onWheelBound: (event: WheelEvent) => void;
 
 	public constructor(container: HTMLElement, options: ChartOptionsInternal) {
@@ -218,6 +219,10 @@ export class ChartWidget implements IDestroyable {
 
 	public crosshairMoved(): ISubscription<MouseEventParamsImplSupplier> {
 		return this._crosshairMoved;
+	}
+
+	public dragEnd(): ISubscription<MouseEventParamsImplSupplier> {
+		return this._dragEnd;
 	}
 
 	public takeScreenshot(): HTMLCanvasElement {
@@ -575,7 +580,7 @@ export class ChartWidget implements IDestroyable {
 		for (let i = actualPaneWidgetsCount; i < targetPaneWidgetsCount; i++) {
 			const paneWidget = new PaneWidget(this, panes[i]);
 			paneWidget.clicked().subscribe(this._onPaneWidgetClicked.bind(this), this);
-
+			paneWidget.dragEnd().subscribe(this._onDragEnd.bind(this), this);
 			this._paneWidgets.push(paneWidget);
 
 			// create and insert separator
@@ -649,6 +654,10 @@ export class ChartWidget implements IDestroyable {
 
 	private _onPaneWidgetCrosshairMoved(time: TimePointIndex | null, point: Point | null): void {
 		this._crosshairMoved.fire(() => this._getMouseEventParamsImpl(time, point));
+	}
+
+	private _onDragEnd(time: TimePointIndex | null, point: Point | null): void {
+		this._dragEnd.fire(() => this._getMouseEventParamsImpl(time, point));
 	}
 
 	private _updateTimeAxisVisibility(): void {

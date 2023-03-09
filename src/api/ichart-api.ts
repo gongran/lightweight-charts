@@ -221,6 +221,11 @@ export interface IChartApi {
 	 */
 	unsubscribeCrosshairMove(handler: MouseEventHandler): void;
 
+
+	subscibeDragEnd(handler: MouseEventHandler): void;
+
+	unsubscribeDragEnd(handler: MouseEventHandler): void;
+
 	/**
 	 * Returns API to manipulate a price scale.
 	 *

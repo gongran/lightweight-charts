@@ -167,6 +167,10 @@ export class MouseEventHandler implements IDestroyable {
 		this._init();
 	}
 
+	public cancelClick(): boolean {
+		return this._cancelClick;
+	}
+
 	public destroy(): void {
 		if (this._unsubscribeOutsideMouseEvents !== null) {
 			this._unsubscribeOutsideMouseEvents();

@@ -107,6 +107,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
+	public readonly _dragEndDelegate: Delegate<MouseEventParams> = new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi;
 
@@ -133,6 +134,15 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 			},
 			this
 		);
+
+		this._chartWidget.dragEnd().subscribe(
+			(paramSupplier: MouseEventParamsImplSupplier) => {
+				if (this._dragEndDelegate.hasListeners()) {
+					this._dragEndDelegate.fire(this._convertMouseParams(paramSupplier()));
+				}
+			}
+		);
+
 
 		const model = this._chartWidget.model();
 		this._timeScaleApi = new TimeScaleApi(model, this._chartWidget.timeAxisWidget());
@@ -260,6 +270,14 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	public subscribeClick(handler: MouseEventHandler): void {
 		this._clickedDelegate.subscribe(handler);
+	}
+
+	public subscibeDragEnd(handler: MouseEventHandler): void {
+		this._dragEndDelegate.subscribe(handler);
+	}
+
+	public unsubscribeDragEnd(handler: MouseEventHandler): void {
+		this._dragEndDelegate.unsubscribe(handler);
 	}
 
 	public unsubscribeClick(handler: MouseEventHandler): void {

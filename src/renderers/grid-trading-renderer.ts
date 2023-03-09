@@ -141,20 +141,20 @@ export class GridTradingRenderer implements IPaneRenderer {
 					
 				}
 				if (this._data?.tradingGridData?.eventType !== 'mouseMoveEvent') {
-					if (priceTopCoordinate) {
-						console.log(
-							'Coordinate to top price',
-							priceTopCoordinate,
-							afterMvTopPrice
-						);
-					}
-					if (priceLowCoordinate) {
-						console.log(
-							'Coordinate to low price',
-							priceLowCoordinate,
-							afterMvLowPrice
-						);
-					}
+					// if (priceTopCoordinate) {
+					// 	console.log(
+					// 		'Coordinate to top price',
+					// 		priceTopCoordinate,
+					// 		afterMvTopPrice
+					// 	);
+					// }
+					// if (priceLowCoordinate) {
+					// 	console.log(
+					// 		'Coordinate to low price',
+					// 		priceLowCoordinate,
+					// 		afterMvLowPrice
+					// 	);
+					// }
 				}
 			}
 		});

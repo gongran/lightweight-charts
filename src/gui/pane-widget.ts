@@ -137,6 +137,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
 	private _clicked: Delegate<TimePointIndex | null, Point> = new Delegate();
+	private _dragEnd: Delegate<TimePointIndex | null, Point> = new Delegate();
 	private _prevPinchScale: number = 0;
 	private _longTap: boolean = false;
 	private _startTrackPoint: Point | null = null;
@@ -464,7 +465,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		this._endScroll(event);
 
 		this._gridTrading.gridTradingPaneView().setData({
-			tradingGridData: {eventType: 'mouseUpEvent' }
+			tradingGridData: { eventType: 'mouseUpEvent' }
 		});
 		const rend = this._gridTrading
 			.panView()
@@ -478,7 +479,17 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 			);
 		}
 
-		console.log('mouseUpEvent');
+		if (this._mouseEventHandler.cancelClick()) {
+			console.log('mouseUpEvent,拖动停止');
+			console.log(this._dragEnd.hasListeners());
+			const x = event.localX;
+			const y = event.localY;
+
+			if (this._dragEnd.hasListeners()) {
+				const currentTime = this._model().crosshairSource().appliedIndex();
+				this._dragEnd.fire(currentTime, { x, y });
+			}
+		}
 	}
 
 	public longTapEvent(event: MouseEventHandlerTouchEvent): void {
@@ -502,6 +513,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 
 	public clicked(): ISubscription<TimePointIndex | null, Point> {
 		return this._clicked;
+	}
+
+	public dragEnd(): ISubscription<TimePointIndex | null, Point> {
+		return this._dragEnd;
 	}
 
 	public pinchStartEvent(): void {
