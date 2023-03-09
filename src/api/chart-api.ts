@@ -107,7 +107,7 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 
 	private readonly _clickedDelegate: Delegate<MouseEventParams> = new Delegate();
 	private readonly _crosshairMovedDelegate: Delegate<MouseEventParams> = new Delegate();
-	public readonly _dragEndDelegate: Delegate<MouseEventParams> = new Delegate();
+	private readonly _dragEndDelegate: Delegate<MouseEventParams> = new Delegate();
 
 	private readonly _timeScaleApi: TimeScaleApi;
 
