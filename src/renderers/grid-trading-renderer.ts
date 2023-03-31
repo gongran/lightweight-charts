@@ -34,6 +34,7 @@ export interface TradingGridData {
 	nowY?: number;
 	color?: string | 'orange';
 	eventType?: string;
+	lines?: number[];
 }
 
 export class GridTradingRenderer implements IPaneRenderer {
@@ -50,6 +51,39 @@ export class GridTradingRenderer implements IPaneRenderer {
 	public getData(): GridTradingRendererData | null {
 		return this._data;
 	}
+
+	formatPrice(price: number) {
+		const scale = 16;
+
+		// 使用正则表达式获取小数位数
+		const divisor = Math.pow(10, scale);
+		// 根据小数位数进行四舍五入操作
+		return Math.round(price * divisor) / divisor;
+	}
+
+	calculateGeometricGridLines(
+		highPrice: number,
+		lowPrice: number,
+		gridQuantity: number
+	) {
+		const grids = new Array(gridQuantity);
+
+		const gridQuantityBigDecimal = gridQuantity - 1;
+		const ratio = Math.pow(highPrice / lowPrice, 1 / gridQuantityBigDecimal);
+
+		const gridLines = [];
+
+		for (let i = 0; i < gridQuantity; i++) {
+			grids[i] = this.formatPrice(lowPrice * Math.pow(ratio, i));
+			const gridLine = {
+				price: grids[i],
+				gridLineNumber: i
+			};
+			gridLines.push(gridLine);
+		}
+		return gridLines;
+	}
+
 	public draw(
 		ctx: CanvasRenderingContext2D,
 		pixelRatio: number,
@@ -81,80 +115,58 @@ export class GridTradingRenderer implements IPaneRenderer {
 				}
 				const highPrice = Number(this._data?.tradingGridData?.highPrice || 0);
 				const lowPrice = Number(this._data?.tradingGridData?.lowPrice || 0);
-				const priceTopCoordinate = this._pane
-					?.rightPriceScale()
-					.priceToCoordinate(highPrice, priceMarksLabel);
-
-				const priceLowCoordinate = this._pane
-					?.rightPriceScale()
-					.priceToCoordinate(lowPrice, priceMarksLabel);
-
-				const topPriceCoordinate = Number(priceTopCoordinate) + movingDistance;
-				const lowPriceCoordinate = Number(priceLowCoordinate) + movingDistance;
-				if (this._data?.tradingGridData) {
-					this._data.tradingGridData.lowCoordinate = lowPriceCoordinate;
-					this._data.tradingGridData.highCoordinate = topPriceCoordinate;
-				}
-
-				// ctx.rect(0, Number(priceCoordinate), width, 2000);
-				ctx.moveTo(0, topPriceCoordinate);
-				ctx.lineTo(width, topPriceCoordinate);
-				ctx.moveTo(0, lowPriceCoordinate);
-				ctx.lineTo(width, lowPriceCoordinate);
-
-				// create grid
-
 				const gridQuantity = Number(
 					this._data?.tradingGridData?.gridQuantity || 0
 				);
+
+				// create grid
+
 				const tradingGridType =
 					this._data?.tradingGridData?.tradingGridType ||
 					TradingGridType.Geometric;
-
+				const lines = [];
+				let afterMvTopPrice = 0;
+				let afterMvLowPrice = 0;
 				if (tradingGridType === TradingGridType.Geometric) {
-					// 等比
-					const gridPrice = (highPrice - lowPrice) / gridQuantity;
-
-					for (let i = 1; i < gridQuantity; i++) {
-						const gridPriceCoordinate = this._pane
+					const gridLines = this.calculateGeometricGridLines(
+						highPrice,
+						lowPrice,
+						gridQuantity
+					);
+					for (const gridLine of gridLines) {
+						const priceCoordinate = this._pane
 							?.rightPriceScale()
-							.priceToCoordinate(lowPrice + gridPrice * i, priceMarksLabel);
-						ctx.moveTo(0, Number(gridPriceCoordinate) + movingDistance);
-						ctx.lineTo(width, Number(gridPriceCoordinate) + movingDistance);
+							.priceToCoordinate(gridLine.price, priceMarksLabel);
+						const priceCoordinateNumber =
+							Number(priceCoordinate) + movingDistance;
+						ctx.moveTo(0, priceCoordinateNumber);
+						ctx.lineTo(width, priceCoordinateNumber);
+						const afterMvPrice = Number(
+							this._pane
+								?.rightPriceScale()
+								.coordinateToPrice(
+									priceCoordinateNumber as Coordinate,
+									priceMarksLabel
+								)
+						);
+						lines.push(afterMvPrice);
+						if (gridLine.gridLineNumber === 0) {
+							afterMvLowPrice = afterMvPrice;
+						}
+						if (gridLine.gridLineNumber === gridQuantity - 1) {
+							afterMvTopPrice = afterMvPrice;
+						}
 					}
 				}
 				ctx.strokeStyle = this._data?.tradingGridData?.color || 'orange';
 				ctx.stroke();
 
-				const afterMvTopPrice = this._pane
-					?.rightPriceScale()
-					.coordinateToPrice(topPriceCoordinate as Coordinate, priceMarksLabel);
-				const afterMvLowPrice = this._pane
-					?.rightPriceScale()
-					.coordinateToPrice(lowPriceCoordinate as Coordinate, priceMarksLabel);
-
 				if (this._data?.tradingGridData?.eventType === 'mouseUpEvent') {
 					this._data.tradingGridData.highPrice = afterMvTopPrice;
 					this._data.tradingGridData.lowPrice = afterMvLowPrice;
-					this._data.tradingGridData.nowY=0;
-					this._data.tradingGridData.preY=0;
-					
-				}
-				if (this._data?.tradingGridData?.eventType !== 'mouseMoveEvent') {
-					// if (priceTopCoordinate) {
-					// 	console.log(
-					// 		'Coordinate to top price',
-					// 		priceTopCoordinate,
-					// 		afterMvTopPrice
-					// 	);
-					// }
-					// if (priceLowCoordinate) {
-					// 	console.log(
-					// 		'Coordinate to low price',
-					// 		priceLowCoordinate,
-					// 		afterMvLowPrice
-					// 	);
-					// }
+					this._data.tradingGridData.nowY = 0;
+					this._data.tradingGridData.preY = 0;
+					this._data.tradingGridData.lines = lines;
 				}
 			}
 		});
