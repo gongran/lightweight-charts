@@ -311,6 +311,9 @@ export class ChartApi implements IChartApi, DataUpdatesConsumer<SeriesType> {
 	public takeScreenshot(): HTMLCanvasElement {
 		return this._chartWidget.takeScreenshot();
 	}
+	public displayStrategy(show:boolean): void {
+		this._chartWidget.displayStrategy(show);
+	}
 
 	private _sendUpdateToChart(update: DataUpdateResponse): void {
 		const model = this._chartWidget.model();

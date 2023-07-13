@@ -261,4 +261,6 @@ export interface IChartApi {
 	 * @returns A canvas with the chart drawn on. Any `Canvas` methods like `toDataURL()` or `toBlob()` can be used to serialize the result.
 	 */
 	takeScreenshot(): HTMLCanvasElement;
+
+	displayStrategy(show:boolean):void;
 }

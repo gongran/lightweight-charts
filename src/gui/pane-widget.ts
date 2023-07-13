@@ -133,7 +133,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 	private readonly _topCanvasBinding: CanvasCoordinateSpaceBinding;
 	private readonly _topGridCanvasBinding: CanvasCoordinateSpaceBinding;
 	private readonly _rowElement: HTMLElement;
-	private readonly _mouseEventHandler: MouseEventHandler;
+	private _mouseEventHandler: MouseEventHandler;
 	private _startScrollingPos: StartScrollPosition | null = null;
 	private _isScrolling: boolean = false;
 	private _clicked: Delegate<TimePointIndex | null, Point> = new Delegate();
@@ -236,6 +236,37 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 					!this._chart.options().handleScroll.horzTouchDrag
 			}
 		);
+	}
+
+	public resetMouseEventHandler(canvas:HTMLCanvasElement): void {
+		this._mouseEventHandler.destroy();
+
+		this._mouseEventHandler = new MouseEventHandler(
+			canvas,
+			this,
+			{
+				treatVertTouchDragAsPageScroll: () =>
+					this._startTrackPoint === null &&
+					!this._chart.options().handleScroll.vertTouchDrag,
+				treatHorzTouchDragAsPageScroll: () =>
+					this._startTrackPoint === null &&
+					!this._chart.options().handleScroll.horzTouchDrag
+			}
+		);
+	}
+
+	public displayStrategy(show:boolean): void {
+		const topCanvas = this._topCanvasBinding.canvas;
+		const topGridCanvas = this._topGridCanvasBinding.canvas;
+		if(show){
+			topCanvas.style.zIndex = '2';
+			topGridCanvas.style.zIndex = '3';
+			this.resetMouseEventHandler(topGridCanvas);
+		}else{
+			topCanvas.style.zIndex = '3';
+			topGridCanvas.style.zIndex = '2';
+			this.resetMouseEventHandler(topCanvas);
+		}
 	}
 
 	public destroy(): void {
@@ -480,8 +511,6 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		}
 
 		if (this._mouseEventHandler.cancelClick()) {
-			console.log('mouseUpEvent,拖动停止');
-			console.log(this._dragEnd.hasListeners());
 			const x = event.localX;
 			const y = event.localY;
 

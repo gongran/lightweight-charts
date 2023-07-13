@@ -307,6 +307,15 @@ export class ChartWidget implements IDestroyable {
 		return targetCanvas;
 	}
 
+	public displayStrategy(show:boolean):void{
+		this._paneWidgets;
+		//循环每个pane
+		for(let i=0;i<this._paneWidgets.length;i++){
+			console.log(this._paneWidgets[i]);
+			this._paneWidgets[i].displayStrategy(show);
+		}
+	}
+
 	public getPriceAxisWidth(position: DefaultPriceScaleId): number {
 		if (position === 'left' && !this._isLeftAxisVisible()) {
 			return 0;

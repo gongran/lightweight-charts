@@ -110,6 +110,8 @@ export class MouseEventHandler implements IDestroyable {
 
 	private readonly _options: MouseEventHandlerOptions;
 
+	private  mouseDownHandler: (event: MouseEvent) => void;
+
 	private _clickCount: number = 0;
 	private _clickTimeoutId: TimerId | null = null;
 	private _clickPosition: Position = { x: Number.NEGATIVE_INFINITY, y: Number.POSITIVE_INFINITY };
@@ -163,7 +165,7 @@ export class MouseEventHandler implements IDestroyable {
 		this._target = target;
 		this._handler = handler;
 		this._options = options;
-
+		this.mouseDownHandler = this._mouseDownHandler.bind(this)
 		this._init();
 	}
 
@@ -171,7 +173,9 @@ export class MouseEventHandler implements IDestroyable {
 		return this._cancelClick;
 	}
 
+
 	public destroy(): void {
+		this._target.removeEventListener('mousedown', this.mouseDownHandler);
 		if (this._unsubscribeOutsideMouseEvents !== null) {
 			this._unsubscribeOutsideMouseEvents();
 			this._unsubscribeOutsideMouseEvents = null;
@@ -646,7 +650,7 @@ export class MouseEventHandler implements IDestroyable {
 
 		this._target.addEventListener('touchstart', this._touchStartHandler.bind(this), { passive: true });
 		preventScrollByWheelClick(this._target);
-		this._target.addEventListener('mousedown', this._mouseDownHandler.bind(this));
+		this._target.addEventListener('mousedown', this.mouseDownHandler);
 
 		this._initPinch();
 
