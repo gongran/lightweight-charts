@@ -401,7 +401,7 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 				?.lowCoordinate || 0;
 		if (y > highCoordinate && y < lowCoordinate) {
 			this._gridTrading.gridTradingPaneView().setData({
-				tradingGridData: { color: 'red', eventType: 'mouseMoveEvent' }
+				tradingGridData: { color: 'green', eventType: 'mouseMoveEvent' }
 			});
 			const rend = this._gridTrading
 				.panView()
@@ -417,10 +417,10 @@ export class PaneWidget implements IDestroyable, MouseEventHandlers {
 		} else {
 			if (
 				state.model().options().gridTradingRendererData?.tradingGridData
-					?.color === 'red'
+					?.color === 'green'
 			) {
 				this._gridTrading.gridTradingPaneView().setData({
-					tradingGridData: { color: 'orange', eventType: 'mouseMoveEvent' }
+					tradingGridData: { color: 'blue', eventType: 'mouseMoveEvent' }
 				});
 				const rend = this._gridTrading
 					.panView()

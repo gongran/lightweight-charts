@@ -311,7 +311,6 @@ export class ChartWidget implements IDestroyable {
 		this._paneWidgets;
 		//循环每个pane
 		for(let i=0;i<this._paneWidgets.length;i++){
-			console.log(this._paneWidgets[i]);
 			this._paneWidgets[i].displayStrategy(show);
 		}
 	}
