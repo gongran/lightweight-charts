@@ -1,6 +1,6 @@
 {
-  "private": true,
-  "version": "5.0.0",
+  "private": false,
+  "version": "5.0.2",
   "name": "lightweight-charts",
   "author": "TradingView, Inc.",
   "license": "Apache-2.0",
@@ -88,8 +88,6 @@
     "typescript": "4.6.2"
   },
   "scripts": {
-    "postinstall": "npm run install-hooks",
-    "install-hooks": "node scripts/githooks/install.js",
     "clean": "rimraf lib/ dist/",
     "bundle-dts": "tsc --noEmit --allowJs dts-config.js && dts-bundle-generator --config dts-config.js",
     "tsc": "ttsc -p tsconfig.prod.json",

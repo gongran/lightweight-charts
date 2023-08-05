@@ -3,6 +3,6 @@
 if (process.env.NODE_ENV === 'production') {
 	module.exports = require('./dist/lightweight-charts.esm.production.js');
 } else {
-	// module.exports = require('./dist/lightweight-charts.esm.development.js');
-	module.exports = require('./lib/prod/src/index.js');
+	module.exports = require('./dist/lightweight-charts.esm.development.js');
+	// module.exports = require('./lib/prod/src/index.js');
 }
